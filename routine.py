@@ -24,7 +24,7 @@ nombre='javier martines'
 telefono= '692875247'
 email='jhonatan.trabajo99@gmail.com'
 
-print('\n  rutine >:v')
+print('\n  rutine >:v..')
 
 
 bot = exe_bot.DriverBot(url, path)
