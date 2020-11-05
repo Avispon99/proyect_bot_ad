@@ -10,15 +10,18 @@ from selenium import webdriver
 
 class DriverBot():
 
+	#login=False
+	login=False
 
-	def __init__(self, url=None ,path=None):
-		self.url = url
+	def __init__(self, path=None):
 		self.path = path
 		self.driver = None
 		
 
 	def run(self,host, port, user=None, pasw=None, 
-		               use_proxy=False, user_agent=None, play=True):
+		     use_proxy=False, user_agent=None, play=True):
+		
+		print('start run..')
 
 
 		manifest_json = """
@@ -96,23 +99,42 @@ chrome.webRequest.onAuthRequired.addListener(
 		def main():
 		    self.driver = get_chromedriver()
 		    #driver.get('https://www.google.com/search?q=my+ip+address')
-		    self.driver.get(self.url)
-		    time.sleep(5)
+		    #self.driver.get(self.url)
+		    time.sleep(1)#<<
 
 		if play:
 			main()
 
 
+	def log(self, log_user, log_psw, url=None):
+		DriverBot.login=True # uso de la variable de clase login
+		print('start log ..')
+		self.driver.get(url)
+		self.driver.find_element_by_id('email').send_keys(log_user)
+		self.driver.find_element_by_id('password').send_keys(log_psw)
 
-	def automate(self,ti,de,no,tel,em):
+		try: # En caso de alerta de cookies 
+			self.driver.execute_script('''
+			var cookies = document.querySelector('button[class="sui-AtomButton sui-AtomButton--primary "]');
+			cookies.click()
+				''')
+		except:
+			pass
 
-		"""
-		url= 'https://www.milanuncios.com/publicar-anuncios-gratis/formulario?c=322'
-		chromeOpt=webdriver.ChromeOptions()
-		chromeOpt.add_argument('--disable-gpu')
-		dv=webdriver.Chrome(executable_path='D:\\chromedriver.exe',chrome_options=chromeOpt)
-		dv.get(url)
-		"""
+		self.driver.execute_script('''
+		var sub=document.querySelector('button[class="sui-AtomButton sui-AtomButton--primaryColor sui-AtomButton--solid sui-AtomButton--fullWidth ma-FormLogin-submitButton"][type="submit"]');	
+		sub.click()
+		'''	)
+
+
+		time.sleep(9)		
+
+
+	def automate(self,ti,de,na,tel,em, url=None):
+		print('start automate..')
+		self.driver.get(url)
+
+		
 
 			#Datos de tu anuncio
 
@@ -165,11 +187,35 @@ chrome.webRequest.onAuthRequired.addListener(
 
 			#Datos de contacto
 
-		name_b=self.driver.find_elements_by_xpath('//input[@id="name" and @name="name"]')[0]
-		name_b.send_keys(no)
+		#nombre	
 
-		mail_b=self.driver.find_elements_by_xpath('//input[@id="email" and @name="email"]')[0]
-		mail_b.send_keys(em)
+		name_b=self.driver.find_elements_by_xpath('//input[@id="name" and @name="name"]')[0]
+
+		try: val_att = name_b.get_attribute("value")
+		except: pass
+
+		if val_att == na: # nombre ya registrado igual => ignorar
+			print('if na')#<<
+			pass
+		elif val_att != '' and val_att != None:
+			self.driver.execute_script('''  var clean = document.getElementById("name"); 
+										    clean.value=""; ''')
+			name_b.send_keys(na)
+			print('elif na')#<<
+
+		else:
+			name_b.send_keys(na)
+			print('else na')#<<
+			print('val_ =', val_att)
+
+
+			# mail
+
+		if DriverBot.login != True:
+			mail_b=self.driver.find_elements_by_xpath('//input[@id="email" and @name="email"]')[0]
+			mail_b.send_keys(em)
+
+			#Telefonos
 
 		tel_b=self.driver.find_elements_by_xpath('//input[@id="mainPhone" and @name="mainPhone"]')[0]
 		tel_b.send_keys(tel)
@@ -177,11 +223,13 @@ chrome.webRequest.onAuthRequired.addListener(
 		#tel2_b=dv.find_elements_by_xpath('//input[@id="secondaryPhone" and @name="secondaryPhone"]')[0]
 		#tel2_b.send_keys('65456')
 
-
-			#Terminos
-
+		
+			#Terminos --NOTA: CAMBIAR EN BASE A VALUE Y NO A login !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	
 		a=self.driver.find_elements_by_css_selector('.sui-AtomCheckbox')[0]
 		a.click()
+		if DriverBot.login == True:
+			a.click() # for any reason require two clicks when using log 
 
 
 			#siguiente
@@ -191,11 +239,60 @@ chrome.webRequest.onAuthRequired.addListener(
 		sig.click()	
 		print('---x---\n')
 
-		time.sleep(5)
+		#time.sleep(5)#temporal
 
-		pic=self.driver.find_elements_by_xpath('//input[@accept="image/jpeg, image/png, image/gif"]')[0]
-		pic.send_keys(r'D:\git_up\job_milanuncios\jura.jpg')
+		#up img 
+		while 1:
+			try: # hasta que encuente la imagen en la siguiente pagina
 
+				pic=self.driver.find_elements_by_xpath('//input[@accept="image/jpeg, image/png, image/gif"]')[0]
+				pic.send_keys(r'D:\git_up\job_milanuncios\jura.jpg')
+				break
+			except: pass
+
+		#interactuando con el panel de carga de img para que envie la img
+		while 1:
+			try:
+				self.driver.execute_script('''var rot= document.querySelectorAll('div[class="sui-MoleculePhotoUploader-thumbCard-button"]')[1];
+					rot.click();
+					rot.click();
+					rot.click();
+					rot.click();	''')
+				break
+			except: pass
+
+
+		#Publicar 
+		
+		while 1:
+			try:	
+				self.driver.execute_script('''
+				var pu= document.querySelector('button[class="ma-ButtonBasic ma-ButtonBasic--primary ma-ButtonBasic--medium"][type="button"]');
+				pu.click()
+											''')
+			except: pass
+		
+
+		name_b=self.driver.find_elements_by_xpath('//input[@id="name" and @name="name"]')[0]
+
+		try: val_att = name_b.get_attribute("value")
+		except: pass
+
+		if val_att == na: # nombre ya registrado igual => ignorar
+			print('if na')#<<
+			pass
+		elif val_att != '' and val_att != None:
+			self.driver.execute_script('''  var clean = document.getElementById("name"); 
+										    clean.value=""; ''')
+			name_b.send_keys(na)
+			print('elif na')#<<
+
+		else:
+			name_b.send_keys(na)
+			print('else na')#<<
+			print('val_ =', val_att)
+
+		
 		while True:
 			pass
 
