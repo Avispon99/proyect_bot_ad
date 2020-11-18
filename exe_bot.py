@@ -6,8 +6,6 @@ from selenium import webdriver
 
 
 
-
-
 class DriverBot():
 
 	#login=False
@@ -148,7 +146,9 @@ chrome.webRequest.onAuthRequired.addListener(
 		price_b.send_keys("8")
 
 
-			#Ubicacion del anuncio
+		
+
+			#Ubicacion del anuncio (menu desplegable de ciudades)
 			
 		ra=random.randint(0,51)
 
@@ -176,6 +176,8 @@ chrome.webRequest.onAuthRequired.addListener(
 		 		li_loc[random_loc].click();	
 
 										'''
+		"""								
+		time.sleep(9)
 		while(True):
 			try:
 				self.driver.execute_script(js_script_2)
@@ -183,27 +185,27 @@ chrome.webRequest.onAuthRequired.addListener(
 				break
 			except:
 				pass	
+		"""
 
+		#Datos de contacto
 
-			#Datos de contacto
+			#nombre	
 
-		#nombre	
+		name_b=self.driver.find_elements_by_xpath('//input[@id="name" and @name="name"]')[0] #buscar elemento
 
-		name_b=self.driver.find_elements_by_xpath('//input[@id="name" and @name="name"]')[0]
-
-		try: val_att = name_b.get_attribute("value")
+		try: val_att = name_b.get_attribute("value") # intentar obtener valor del "value" atributo
 		except: pass
 
-		if val_att == na: # nombre ya registrado igual => ignorar
+		if val_att == na: # nombre ya registrado(valor obtenido) es igual => ignorar
 			print('if na')#<<
 			pass
-		elif val_att != '' and val_att != None:
+		elif val_att != '' and val_att != None: # si atributo obtenido no es nulo pero tampoco es igual => limpiar lo que encuentre y enviar el nuevo valor 
 			self.driver.execute_script('''  var clean = document.getElementById("name"); 
 										    clean.value=""; ''')
 			name_b.send_keys(na)
 			print('elif na')#<<
 
-		else:
+		else:  # de cualquier otro caso solo enviar el valor a escribir
 			name_b.send_keys(na)
 			print('else na')#<<
 			print('val_ =', val_att)
@@ -215,10 +217,30 @@ chrome.webRequest.onAuthRequired.addListener(
 			mail_b=self.driver.find_elements_by_xpath('//input[@id="email" and @name="email"]')[0]
 			mail_b.send_keys(em)
 
+
 			#Telefonos
 
-		tel_b=self.driver.find_elements_by_xpath('//input[@id="mainPhone" and @name="mainPhone"]')[0]
-		tel_b.send_keys(tel)
+		tel_b=self.driver.find_elements_by_xpath('//input[@id="mainPhone" and @name="mainPhone"]')[0] # buscar elemento
+		#tel_b.send_keys(tel)#<<
+
+		try: val_p1 = tel_b.get_attribute("value") # intentar obtener valor del "value" atributo
+		except: pass
+
+		if val_p1 == tel: # nombre ya registrado(valor obtenido) es igual => ignorar
+			print('if na')#<<
+			pass
+		elif val_p1 != '' and val_p1 != None: # si atributo obtenido no es nulo pero tampoco es igual => limpiar lo que encuentre y enviar el nuevo valor 
+			self.driver.execute_script('''  var clean = document.getElementById("mainPhone"); 
+										    clean.value=""; ''')
+			tel_b.send_keys(tel)
+			print('elif na')#<<
+
+		else:  # de cualquier otro caso solo enviar el valor a escribir
+			tel_b.send_keys(tel)
+			print('else na')#<<
+			print('val_ =', val_p1)
+
+
 
 		#tel2_b=dv.find_elements_by_xpath('//input[@id="secondaryPhone" and @name="secondaryPhone"]')[0]
 		#tel2_b.send_keys('65456')
@@ -232,6 +254,18 @@ chrome.webRequest.onAuthRequired.addListener(
 			a.click() # for any reason require two clicks when using log 
 
 
+		
+		# Ejecutar seleccion de localidad al final para eludir la influencia de las cookies en la sincronizacion del menu desplegable
+		while(True):
+			try:
+				self.driver.execute_script(js_script_2)
+				print('\n... ok')
+				break
+			except:
+				pass
+
+
+			
 			#siguiente
 
 		print('---o---')
@@ -264,38 +298,35 @@ chrome.webRequest.onAuthRequired.addListener(
 
 		#Publicar 
 		
-		while 1:
+		while 1: #Nota: Controlar esto con busqueda 
 			try:	
 				self.driver.execute_script('''
 				var pu= document.querySelector('button[class="ma-ButtonBasic ma-ButtonBasic--primary ma-ButtonBasic--medium"][type="button"]');
 				pu.click()
 											''')
+				break	
 			except: pass
-		
 
-		name_b=self.driver.find_elements_by_xpath('//input[@id="name" and @name="name"]')[0]
+		 
 
-		try: val_att = name_b.get_attribute("value")
-		except: pass
 
-		if val_att == na: # nombre ya registrado igual => ignorar
-			print('if na')#<<
-			pass
-		elif val_att != '' and val_att != None:
-			self.driver.execute_script('''  var clean = document.getElementById("name"); 
-										    clean.value=""; ''')
-			name_b.send_keys(na)
-			print('elif na')#<<
 
-		else:
-			name_b.send_keys(na)
-			print('else na')#<<
-			print('val_ =', val_att)
+		"""	
+		self.driver.execute_script('''
+		var pu= document.querySelector('button[class="ma-ButtonBasic ma-ButtonBasic--primary ma-ButtonBasic--medium"][type="button"]');
+		pu.click()
+									''')		
+		"""#<<
 
 		
+		
+
+		print('FINAL...')
+
+		"""
 		while True:
 			pass
-
+		"""
 
 
 if __name__ == '__main__':
