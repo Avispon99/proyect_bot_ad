@@ -17,10 +17,6 @@ sub.click()
 '''	)
 
 
-#butt=dv.find_elements_by_css_selector('.sui-AtomButton sui-AtomButton--primaryColor sui-AtomButton--solid sui-AtomButton--fullWidth ma-FormLogin-submitButton')
-#b=dv.find_elements_by_xpath('//button[@class="sui-AtomButton sui-AtomButton--primaryColor sui-AtomButton--solid sui-AtomButton--fullWidth ma-FormLogin-submitButton" and @type="submit"]')[0].click()
-#print(b)
-
 
 """
 #butt=dv.find_elements_by_xpath('//button')

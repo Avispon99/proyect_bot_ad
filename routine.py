@@ -5,10 +5,10 @@ import random, re
 #url = 'https://www.myip.com/'
 #path = 'D:\\c_driver\\chromedriver.exe'
 path = 'D:\\chromedriver.exe'
-PROXY_HOST = '193.26.152.81'  # rotating proxy
+PROXY_HOST = '212.115.44.178'  # rotating proxy
 PROXY_PORT = 58542
-PROXY_USER = 'gv4sL1Nwga'
-PROXY_PASS = 'c0bY1fQVNY'
+PROXY_USER = 'tdt1RvAi59'
+PROXY_PASS = 'VtSlkEIrJt'
 
 log_url='https://www.milanuncios.com/mis-anuncios'
 log_mail='testmaster1255aa@gmail.com'
