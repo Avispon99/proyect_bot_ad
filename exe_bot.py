@@ -169,9 +169,32 @@ chrome.webRequest.onAuthRequired.addListener(
 		var sub=document.querySelector('button[class="sui-AtomButton sui-AtomButton--primaryColor sui-AtomButton--solid sui-AtomButton--fullWidth ma-FormLogin-submitButton"][type="submit"]');	
 		sub.click()
 		'''	)
+		print('before -log')
+		time.sleep(25)	
+		#l=self.driver.find_elements_by_xpath('//a[@class="ma-NavigationTopNav-accountInfo-logoutLn"]')[0].text#<<
+		cn=0
+		while 1:
+			if cn ==10000: # if after 10000 tries it no achieved get loguin, send "False" and restart the proces
+				
+				return False
+			try:
+				l=self.driver.find_elements_by_css_selector('a[class="ma-NavigationTopNav-accountInfo-logoutLn"]')[0].text #<<
+				print('l:',l, len(l))
+			except: pass
 
+			if l=='Cerrar sesión': # if found a text that say 'cerrar sesion', it means that already is logued
+				print('OK LOGUIN')
+				cn=0 # just for if anything :v
+				return True # Before to start automate in routine file, first ensure that the login was succesfull
+			cn+=1
+			print('try login No:',cn)
 
-		time.sleep(9)		
+		#	print('foloww')#<< 
+		#self.driver.execute_script('document.querySelector(\'p[class="m"]\');')
+		#print('l:',l, len(l))
+		#print('after -log--')	
+		#time.sleep(999999)
+
 
 
 	def automate(self,ti,de,na,tel,em, url=None):
@@ -264,7 +287,7 @@ chrome.webRequest.onAuthRequired.addListener(
 
 			# mail
 
-		if DriverBot.login != True:
+		if DriverBot.login != True: #pending to improve , value instead of login!!!!
 			mail_b=self.driver.find_elements_by_xpath('//input[@id="email" and @name="email"]')[0]
 			mail_b.send_keys(em)
 
@@ -389,6 +412,9 @@ chrome.webRequest.onAuthRequired.addListener(
 		while True:
 			pass
 		"""
+
+	def close_bot(self):
+		self.driver.close()
 
 
 if __name__ == '__main__':

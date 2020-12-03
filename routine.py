@@ -1,31 +1,7 @@
 import exe_bot
-import random, re
+import random, re, time
 
 
-#url = 'https://www.myip.com/'
-#path = 'D:\\c_driver\\chromedriver.exe'
-path = 'D:\\chromedriver.exe'
-PROXY_HOST = '212.115.44.178'  # rotating proxy
-PROXY_PORT = 58542
-PROXY_USER = 'tdt1RvAi59'
-PROXY_PASS = 'VtSlkEIrJt'
-
-log_url='https://www.milanuncios.com/mis-anuncios'
-log_mail='testmaster1255aa@gmail.com'
-log_psw='master1255aa'
-
-url= 'https://www.milanuncios.com/publicar-anuncios-gratis/formulario?c=323'
-
-#titulo ='Elaboracion del tfg /tfm y Tesis Doctoral'
-titulo ='Elaboracionn de tesis tfg /tfm'
-descripcion='''Te ayudamos Con los problemas academicos que tengas sobre el proyecto final de grado podemos asesorarte con clases particulares
-para la elaboracion del guion final del tfg o tfm y tesis doctoral en todas las ramas y todas las universidades tales como:
-Ade, Marketinng, Derecho, Economia, Planes de viabilidad o de empresa/negocio, analisis del TIR y BAN, analisis estadistico SPSS,
-psicologia, educacion, administracion, ingieneria, informatica entre otros, SPSS, psicologia, educacion, administracion, ingieneria,
-informatica entre otros. no dudes de contactar atraves de mesjaes privado correo o WhatsApp sin compromiso'''
-nombre='javier martines'
-telefono= '692875247'
-email='jhonatan.trabajo99@gmail.com'
 
 
 def rand(item):
@@ -116,18 +92,8 @@ def modifi_d(descripcion):
 	return pa_mo
 
 
-#char=['-','']
 
-char=['',' ','-','.','..','>','+','.','¨','*','`','``','<','|','°','~','¬','_','','^','#','','','¨',':',',','','',' ',' ','!']
 
-ti=titulo
-de=descripcion
-save_t=[]
-save_d=[]
-t=False
-d=False
-add_c=0
-restart=False
 
 #compprobar que "ti" es distinto a todos loe de la lista "save_t"
 def dif_t():
@@ -155,69 +121,152 @@ def dif_d():
 	return ret_d
 
 
-#Iniciar Programa
+
+
+
+#url = 'https://www.myip.com/'
+#path = 'D:\\c_driver\\chromedriver.exe'
+path = 'D:\\chromedriver.exe'
+
+log_url='https://www.milanuncios.com/mis-anuncios'
+log_mail='testmaster1255aa@gmail.com'
+log_psw='master1255aa'
+
+url= 'https://www.milanuncios.com/publicar-anuncios-gratis/formulario?c=323'
+
+#titulo ='Elaboracion del tfg /tfm y Tesis Doctoral'
+titulo ='Elaboracionn de tesis tfg /tfm'
+descripcion='''Te ayudamos Con los problemas academicos que tengas sobre el proyecto final de grado podemos asesorarte con clases particulares
+para la elaboracion del guion final del tfg o tfm y tesis doctoral en todas las ramas y todas las universidades tales como:
+Ade, Marketinng, Derecho, Economia, Planes de viabilidad o de empresa/negocio, analisis del TIR y BAN, analisis estadistico SPSS,
+psicologia, educacion, administracion, ingieneria, informatica entre otros, SPSS, psicologia, educacion, administracion, ingieneria,
+informatica entre otros. no dudes de contactar atraves de mesjaes privado correo o WhatsApp sin compromiso'''
+nombre='javier martines'
+telefono= '692875247'
+email='jhonatan.trabajo99@gmail.com'
+
+dic={0:['212.115.44.178',58542,'tdt1RvAi59','VtSlkEIrJt'], 1:['212.115.44.178',58542,'tdt1RvAi59','VtSlkEIrJt'],2:['212.115.44.178',58542,'tdt1RvAi59','VtSlkEIrJt']}
+
+
+
+ti=titulo
+de=descripcion
+save_t=[]
+save_d=[]
+t=False
+d=False
+add_c=0
+restart=False
+count_ro=0
+c=0
+
+char=['',' ','-','.','..','>','+','.','¨','*','`','``','<','|','°','~','¬','_','','^','#','','','¨',':',',','','',' ',' ','!']
+
+
+
+#Start program
 
 log=input('LOGIN? ---> ')
 ruti=input('CICLOS ---> ')
+rotation=input('Rotaciones por ciclo--> ')
 
-bot = exe_bot.DriverBot(path)
-bot.run(PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS, use_proxy=True)
+print()
 
-if log == 'y' or log =='Y': 
-	bot.log(log_mail, log_psw, url=log_url)	
 
-for i in range(int(ruti)):
-	print('principio->')
-	
-	#Garantizar no repeticion de titulo por comparacion de "save_t" con "ti"
-	while 1:
-		if save_t == [] or dif_t():
-			if restart == True: #Si fueron reiniciadas las listas entonces igual se titulo original se procesa
-				ti = modifi_t(titulo)
-				restart=False  #Se reincia nuevamente a "False" para que no intefiera posteriormente
-				print('restart---> modifi  ')  
-			t=True
-			break
-		else: 
-			ti = modifi_t(titulo) #Mejor procesar siempre sobre el original para no crar variaciones muy extrañas
-			print('else: Modifi')
-	
+for ro in dic.keys():
 
-	#Garantizar no repeticion de descripcion por comparacion de "save_d" con "de" 	
-	while 1:
-		if save_d == [] or dif_d():
-			if restart == True: #Si fueron reiniciadas las listas entonces igual se titulo original se procesa
+	if c == int(ruti): break # verify that not exceed the amount of "ciclos" (ruti) in case that the "dic.keys" is greater than "ruti"
+
+	print('Conect with-prox: ', ro)
+
+	PROXY_HOST = dic[ro][0]  # rotating proxy
+	PROXY_PORT = dic[ro][1]
+	PROXY_USER = dic[ro][2]
+	PROXY_PASS = dic[ro][3]
+
+	print(PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS)
+
+	#instance of Driver Bot
+	bot = exe_bot.DriverBot(path)
+
+	#Run conection and set proxy
+	bot.run(PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS, use_proxy=True)
+
+	if log == 'y' or log =='Y':
+		while 1:
+			print('try log from routine file..') 
+			res=bot.log(log_mail, log_psw, url=log_url)
+			if res == True:
+				print('succes log from routine***')
+				break
+			else:
+				print('restart log')
+				bot.close_bot()
+						
+
+	for i in range(int(ruti)):
+		print('principio->')
+		
+		#Garantizar no repeticion de titulo por comparacion de "save_t" con "ti"
+		while 1:
+			if save_t == [] or dif_t():
+				if restart == True: #Si fueron reiniciadas las listas entonces igual se titulo original se procesa
+					ti = modifi_t(titulo)
+					restart=False  #Se reincia nuevamente a "False" para que no intefiera posteriormente
+					print('restart---> modifi  ')  
+				t=True
+				break
+			else: 
+				ti = modifi_t(titulo) #Mejor procesar siempre sobre el original para no crar variaciones muy extrañas
+				print('else: Modifi')
+		
+
+		#Garantizar no repeticion de descripcion por comparacion de "save_d" con "de" 	
+		while 1:
+			if save_d == [] or dif_d():
+				if restart == True: #Si fueron reiniciadas las listas entonces igual se titulo original se procesa
+					de = modifi_d(descripcion)
+					restart=False # esta linea talvez no sea necesario hacerla nuevamente pero por si acaso	
+					print('restart---> modifi_d') 		
+				t=True
+				break
+			else: 
 				de = modifi_d(descripcion)
-				restart=False # esta linea talvez no sea necesario hacerla nuevamente pero por si acaso	
-				print('restart---> modifi_d') 		
-			t=True
+				print('restart---> modifi_d') 
+		
+		# Asegurarse que "ti" y "de" sean distintos al obtener positivos en sus respectivos ciclos de compraración
+		if t or d: #<< NOTA: NO OLVIDAR CAMBIAR POR "and" al finalizar los test. 	
+			bot.automate(ti, de, nombre, telefono, email, url)
+			print('\nLista Save_d:\n', save_t,'\n' )
+			print('\n-----<>.. ti actual o Mofificado ..<>-----\n'+ ti+'\n')
+			print('\nLista Save_d:\n', save_d,'\n\n  Len: '+str(len(save_d))+'\n\n' )
+			print('\n ---< de actual o Mofificado >---\n\n'+ de+'\n')
+
+		save_t.append(ti)
+		save_d.append(de)
+
+		if add_c == 3+1: #<< 3 debe replazarse por una variable electiva en su version final
+			add_c=0
+			save_t=[]
+			save_d=[]
+			restart=True
+			print('Restart <<')
+		print('------------------------ -------------------------------->', add_c)	
+
+		add_c+=1
+		count_ro+=1
+		c+=1
+		
+		#Restart conection with anoter proxy in case that is complain amount of loops before to neext rotation
+		if count_ro == int(rotation):
+			count_ro=0
+			time.sleep(2)
+			bot.close_bot()
+			print('xxxxxxxxx change rotation')
 			break
-		else: 
-			de = modifi_d(descripcion)
-			print('restart---> modifi_d') 
-	
-	# Asegurarse que "ti" y "de" sean distintos al obtener positivos en sus respectivos ciclos de compraración
-	if t or d: #<< NOTA: NO OLVIDAR CAMBIAR POR "and" al finalizar los test. 	
-		bot.automate(ti, de, nombre, telefono, email, url)
-		print('\nLista Save_d:\n', save_t,'\n' )
-		print('\n-----<>.. ti actual o Mofificado ..<>-----\n'+ ti+'\n')
-		print('\nLista Save_d:\n', save_d,'\n\n  Len: '+str(len(save_d))+'\n\n' )
-		print('\n ---< de actual o Mofificado >---\n\n'+ de+'\n')
 
-	save_t.append(ti)
-	save_d.append(de)
-
-	if add_c == 3+1: #<< 3 debe replazarse por una variable electiva en su version final
-		add_c=0
-		save_t=[]
-		save_d=[]
-		restart=True
-		print('Restart <<')
-	print('------------------------ -------------------------------->', add_c)	
-
-	add_c+=1
-
-	print('FINISH CLICLO')	
+		print('FINISH CLICLO')
+		print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Total',c,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')	
 
 
 
