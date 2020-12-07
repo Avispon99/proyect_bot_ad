@@ -159,6 +159,7 @@ add_c=0
 restart=False
 count_ro=0
 c=0
+t=0
 
 char=['',' ','-','.','..','>','+','.','¨','*','`','``','<','|','°','~','¬','_','','^','#','','','¨',':',',','','',' ',' ','!']
 
@@ -170,103 +171,109 @@ log=input('LOGIN? ---> ')
 ruti=input('CICLOS ---> ')
 rotation=input('Rotaciones por ciclo--> ')
 
-print()
+while 1:
+	print('PLAY........................................++++++++..', c,'--->',ruti)
+	if c >= int(ruti):
+		print("<- C U T ->")
+		break
 
 
-for ro in dic.keys():
+	for ro in dic.keys():
 
-	if c == int(ruti): break # verify that not exceed the amount of "ciclos" (ruti) in case that the "dic.keys" is greater than "ruti"
+		if c == int(ruti): break # verify that not exceed the amount of "ciclos" (ruti) in case that the "dic.keys" is greater than "ruti"
 
-	print('Conect with-prox: ', ro)
+		print('Conect with-prox: ', ro)
 
-	PROXY_HOST = dic[ro][0]  # rotating proxy
-	PROXY_PORT = dic[ro][1]
-	PROXY_USER = dic[ro][2]
-	PROXY_PASS = dic[ro][3]
+		PROXY_HOST = dic[ro][0]  # rotating proxy
+		PROXY_PORT = dic[ro][1]
+		PROXY_USER = dic[ro][2]
+		PROXY_PASS = dic[ro][3]
 
-	print(PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS)
+		print(PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS)
 
-	#instance of Driver Bot
-	bot = exe_bot.DriverBot(path)
+		#instance of Driver Bot
+		bot = exe_bot.DriverBot(path)
 
-	#Run conection and set proxy
-	bot.run(PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS, use_proxy=True)
+		#Run conection and set proxy
+		bot.run(PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASS, use_proxy=True)
 
-	if log == 'y' or log =='Y':
-		while 1:
-			print('try log from routine file..') 
-			res=bot.log(log_mail, log_psw, url=log_url)
-			if res == True:
-				print('succes log from routine***')
-				break
-			else:
-				print('restart log')
-				bot.close_bot()
-						
+		if log == 'y' or log =='Y':
+			while 1:
+				print('try log from routine file..') 
+				res=bot.log(log_mail, log_psw, url=log_url)
+				if res == True:
+					print('succes log from routine***')
+					break
+				else:
+					print('restart log')
+					bot.close_bot()
+							
 
-	for i in range(int(ruti)):
-		print('principio->')
-		
-		#Garantizar no repeticion de titulo por comparacion de "save_t" con "ti"
-		while 1:
-			if save_t == [] or dif_t():
-				if restart == True: #Si fueron reiniciadas las listas entonces igual se titulo original se procesa
-					ti = modifi_t(titulo)
-					restart=False  #Se reincia nuevamente a "False" para que no intefiera posteriormente
-					print('restart---> modifi  ')  
-				t=True
-				break
-			else: 
-				ti = modifi_t(titulo) #Mejor procesar siempre sobre el original para no crar variaciones muy extrañas
-				print('else: Modifi')
-		
+		for i in range(int(ruti)):
 
-		#Garantizar no repeticion de descripcion por comparacion de "save_d" con "de" 	
-		while 1:
-			if save_d == [] or dif_d():
-				if restart == True: #Si fueron reiniciadas las listas entonces igual se titulo original se procesa
+			time.sleep(t) # Time of interval
+			print('principio->')
+			
+			#Garantizar no repeticion de titulo por comparacion de "save_t" con "ti"
+			while 1:
+				if save_t == [] or dif_t():
+					if restart == True: #Si fueron reiniciadas las listas entonces igual se titulo original se procesa
+						ti = modifi_t(titulo)
+						restart=False  #Se reincia nuevamente a "False" para que no intefiera posteriormente
+						print('restart---> modifi  ')  
+					t=True
+					break
+				else: 
+					ti = modifi_t(titulo) #Mejor procesar siempre sobre el original para no crar variaciones muy extrañas
+					print('else: Modifi')
+			
+
+			#Garantizar no repeticion de descripcion por comparacion de "save_d" con "de" 	
+			while 1:
+				if save_d == [] or dif_d():
+					if restart == True: #Si fueron reiniciadas las listas entonces igual se titulo original se procesa
+						de = modifi_d(descripcion)
+						restart=False # esta linea talvez no sea necesario hacerla nuevamente pero por si acaso	
+						print('restart---> modifi_d') 		
+					t=True
+					break
+				else: 
 					de = modifi_d(descripcion)
-					restart=False # esta linea talvez no sea necesario hacerla nuevamente pero por si acaso	
-					print('restart---> modifi_d') 		
-				t=True
+					print('restart---> modifi_d') 
+			
+			# Asegurarse que "ti" y "de" sean distintos al obtener positivos en sus respectivos ciclos de compraración
+			if t or d: #<< NOTA: NO OLVIDAR CAMBIAR POR "and" al finalizar los test. 	
+				bot.automate(ti, de, nombre, telefono, email, '692871111' , url)
+				print('\nLista Save_d:\n', save_t,'\n' )
+				print('\n-----<>.. ti actual o Mofificado ..<>-----\n'+ ti+'\n')
+				print('\nLista Save_d:\n', save_d,'\n\n  Len: '+str(len(save_d))+'\n\n' )
+				print('\n ---< de actual o Mofificado >---\n\n'+ de+'\n')
+
+			save_t.append(ti)
+			save_d.append(de)
+
+			if add_c == 3+1: #<< 3 debe replazarse por una variable electiva en su version final
+				add_c=0
+				save_t=[]
+				save_d=[]
+				restart=True
+				print('Restart <<')
+			print('------------------------ -------------------------------->', add_c)	
+
+			add_c+=1
+			count_ro+=1
+			c+=1
+			
+			#Restart conection with anoter proxy in case that is complain amount of loops before to neext rotation
+			if count_ro == int(rotation):
+				count_ro=0
+				time.sleep(2)
+				bot.close_bot()
+				print('xxxxxxxxx change rotation')
 				break
-			else: 
-				de = modifi_d(descripcion)
-				print('restart---> modifi_d') 
-		
-		# Asegurarse que "ti" y "de" sean distintos al obtener positivos en sus respectivos ciclos de compraración
-		if t or d: #<< NOTA: NO OLVIDAR CAMBIAR POR "and" al finalizar los test. 	
-			bot.automate(ti, de, nombre, telefono, email, url)
-			print('\nLista Save_d:\n', save_t,'\n' )
-			print('\n-----<>.. ti actual o Mofificado ..<>-----\n'+ ti+'\n')
-			print('\nLista Save_d:\n', save_d,'\n\n  Len: '+str(len(save_d))+'\n\n' )
-			print('\n ---< de actual o Mofificado >---\n\n'+ de+'\n')
 
-		save_t.append(ti)
-		save_d.append(de)
-
-		if add_c == 3+1: #<< 3 debe replazarse por una variable electiva en su version final
-			add_c=0
-			save_t=[]
-			save_d=[]
-			restart=True
-			print('Restart <<')
-		print('------------------------ -------------------------------->', add_c)	
-
-		add_c+=1
-		count_ro+=1
-		c+=1
-		
-		#Restart conection with anoter proxy in case that is complain amount of loops before to neext rotation
-		if count_ro == int(rotation):
-			count_ro=0
-			time.sleep(2)
-			bot.close_bot()
-			print('xxxxxxxxx change rotation')
-			break
-
-		print('FINISH CLICLO')
-		print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Total',c,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')	
+			print('FINISH CLICLO')
+			print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Total',c,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')	
 
 
 

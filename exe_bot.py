@@ -7,7 +7,8 @@ from selenium import webdriver
 
 #bug_1=False
 cont=0
-t=1 
+t=1
+c_bug=0
 
 # is necesary send "self" of the class as argument (and here is receiv as the argument 'objeto') for can use self variables outside of the class, too "js_script_2" as js2
 def bug_municip(objeto, js2): 
@@ -197,34 +198,20 @@ chrome.webRequest.onAuthRequired.addListener(
 
 
 
-	def automate(self,ti,de,na,tel,em, url=None):
+	def automate(self,ti,de,na,tel,em, tel2=False, url=None):
+
+		print('*Set requested vars::')
+
+		#Global variables to manage bugs
+
+		global c_bug
 		global cont
 		global t
 
-		print('start automate..')
-		self.driver.get(url)
 
-		
-			#Datos de tu anuncio
-		while 1:
-			try:
-				title_b=self.driver.find_elements_by_xpath('//input[@id="title" and @name="title"]')[0]
-				title_b.send_keys(ti)
-				break
-			except: pass
+		# Variables of JavaScript to choose randon option in ubication deployed menus
 
-		descript_b=self.driver.find_elements_by_xpath('//textarea[@id="description" and @name="description"]')[0]
-		descript_b.send_keys(de)
-
-		price_b=self.driver.find_elements_by_xpath('//input[@id="price" and @name="price"]')[0]
-		price_b.send_keys("8")
-
-
-		
-
-			#Ubicacion del anuncio (menu desplegable de ciudades)
-			
-		ra=random.randint(0,51)
+		ra = random.randint(0,51)
 
 		js_script = '''
 
@@ -232,9 +219,6 @@ chrome.webRequest.onAuthRequired.addListener(
 				var li_list = ul_base.querySelectorAll("li");
 				li_list[%d].click();
 										''' % (ra)
-		self.driver.execute_script(js_script)
-
-		#time.sleep(0.1)
 
 		js_script_2='''
 
@@ -249,18 +233,73 @@ chrome.webRequest.onAuthRequired.addListener(
 		 		random_loc = fu(0, len + 1);
 		 		li_loc[random_loc].click();	
 
-										'''
-										
+										'''		
+
+		def solve_bug():
+			print('.....start process ongoing') 
+
+			self.driver.get(url)
+
+			print('... [Get-URL IN AUTOMATE] ...')
+			
+				#Datos de tu anuncio
+			while 1:
+				try:
+					title_b=self.driver.find_elements_by_xpath('//input[@id="title" and @name="title"]')[0]
+					title_b.send_keys(ti)
+					print('... SUCCES PLACED TITLE...')
+					c_bug=0
+					break
+				except:
+					c_bug+=1
+					if c_bug == 200:
+						print('Try get url again >:v')
+						self.driver.get(url)
+						c_bug=0	
+					pass 
+
+			print('-[0]-')		
+			descript_b=self.driver.find_elements_by_xpath('//textarea[@id="description" and @name="description"]')[0]
+			descript_b.send_keys(de)
+
+			price_b=self.driver.find_elements_by_xpath('//input[@id="price" and @name="price"]')[0]
+			price_b.send_keys("8")
+
+
+			print('-[1]-')		
+
+				#Ubicacion del anuncio (menu desplegable de ciudades)
+				
+
+			self.driver.execute_script(js_script)
+
+			#time.sleep(0.1)
+
+
+
+		print('                               > Start Automate <')
+
+		solve_bug()								
+
+		print('-[2]-')										
 		#time.sleep(9)
 		while(True):
 			try:
+				print(' ------------                        TRY js_script_2')
 				self.driver.execute_script(js_script_2)
-				print('\n... ok')
+				print('\n... js_script_2')
+				c_bug=0
 				break
-			except:
+			except Exception as e:
+				print('-[2]- exept: ', e)
+				c_bug+=1
+				if c_bug==200:
+					print('                        =======> Badly is necesary use solve_bug for restart automate >.>')
+					solve_bug() # As despair mean in case to stalemate for eternal error "Cannot click in undefined element"
+					c_bug=0					
 				pass	
 		
-
+		print('-[3]-')			
 		#Datos de contacto
 
 			#nombre	
@@ -285,15 +324,27 @@ chrome.webRequest.onAuthRequired.addListener(
 			print('val_ =', val_att)
 
 
+		print('-[4]-')			
 			# mail
 
-		if DriverBot.login != True: #pending to improve , value instead of login!!!!
-			mail_b=self.driver.find_elements_by_xpath('//input[@id="email" and @name="email"]')[0]
+		mail_b=self.driver.find_elements_by_xpath('//input[@id="email" and @name="email"]')[0]
+		try: val_m = mail_b.get_attribute("value") # intentar obtener valor del "value" atributo
+		except: pass
+
+		print('val_b->_',val_m)
+		if val_m != '' and val_m != None:
+			print('[[ pass val_m] ]') 
+			pass
+		elif val_m == '' or val_m == None:
+			print('[[ send keys val_m] ]')
 			mail_b.send_keys(em)
 
 
+		print('-[5]-')	
+
 			#Telefonos
 
+		#Tel 1	
 		tel_b=self.driver.find_elements_by_xpath('//input[@id="mainPhone" and @name="mainPhone"]')[0] # buscar elemento
 		#tel_b.send_keys(tel)#<<
 
@@ -314,34 +365,53 @@ chrome.webRequest.onAuthRequired.addListener(
 			print('else na')#<<
 			print('val_ =', val_p1)
 
-
-
-		#tel2_b=dv.find_elements_by_xpath('//input[@id="secondaryPhone" and @name="secondaryPhone"]')[0]
-		#tel2_b.send_keys('65456')
-
-		
-			#Terminos --NOTA: CAMBIAR EN BASE A VALUE Y NO A login !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	
-		a=self.driver.find_elements_by_css_selector('.sui-AtomCheckbox')[0]
-		a.click()
-		if DriverBot.login == True:
-			a.click() # for any reason require two clicks when using log 
-
-
-		
-		# Ejecutar seleccion de localidad al final para eludir la influencia de las cookies en la sincronizacion del menu desplegable
-		#time.sleep(0.1)
-		"""
-		while(True):
-			try:
-				self.driver.execute_script(js_script_2)
-				print('\n... ok')
-				break
-			except:
-				pass
-		"""
-
+		print('-[6]-')	
 			
+		#Tel 2
+		if tel2!=False:
+			print('°°°°tel2°°°°')
+			tel2_b=self.driver.find_elements_by_xpath('//input[@id="secondaryPhone" and @name="secondaryPhone"]')[0]
+
+			try: val_p2 = tel2_b.get_attribute("value") # intentar obtener valor del "value" atributo
+			except: pass
+
+			if val_p2 == tel2: # nombre ya registrado(valor obtenido) es igual => ignorar
+				print('IF of tel2')#<<
+				pass
+			elif val_p2 != '' and val_p2 != None: # si atributo obtenido no es nulo pero tampoco es igual => limpiar lo que encuentre y enviar el nuevo valor 
+				self.driver.execute_script('''  var clean = document.getElementById("mainPhone"); 
+											    clean.value=""; ''')
+				tel2_b.send_keys(tel2)
+				print('ELIF of tel2')#<<
+
+			else:  # de cualquier otro caso solo enviar el valor a escribir
+				tel2_b.send_keys(tel2)
+				print('ELSE of tel2')#<<
+				print('val_2 =', val_p2)			
+
+
+
+		print('-[7]-')		
+
+		
+		print('await for click terms...[[')#<<
+		#time.sleep(9)
+			#Terminos --NOTA: CAMBIAR EN BASE A VALUE Y NO A login !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		term=self.driver.find_elements_by_css_selector('#terms')[0] # find by "ID" but is "#"  if were by class would be with "." instead
+		val_term = term.get_attribute("value") # intentar obtener valor del "value" atributo
+		print('value of term---:',val_term)
+
+		if val_term=='true':
+			print('term TRUE')
+			pass
+		else:
+			print('term FALSE')
+			self.driver.find_elements_by_css_selector('.sui-AtomCheckbox')[0].click() # when is "false" only can found and click the element the element external instead of input element 
+	
+
+		print('-[8]-')
+
+
 			#siguiente
 
 		print('---o---')
